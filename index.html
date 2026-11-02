@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0713">
+<meta name="description" content="输入名字，测出 1–100 的彩虹含量。同名同分，纯属娱乐 🌈">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gay 指数检测器 🌈">
+<meta property="og:description" content="输入名字，测出 1–100 的彩虹含量。同名同分，纯属娱乐。">
+<meta name="twitter:card" content="summary">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%235eead4'/%3E%3Cstop offset='.5' stop-color='%23a78bfa'/%3E%3Cstop offset='1' stop-color='%23f472b6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='url(%23g)' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>Gay 指数检测器 🌈</title>
+<style>
+  *{box-sizing:border-box}
+  :root{
+    --bg:#0b0713;
+    --txt:#f4effc;
+    --muted:#a89bc0;
+    --line:rgba(255,255,255,.10);
+    --accent:#f472b6;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;
+    min-height:100vh;
+    padding:44px 18px 56px;
+    display:flex;
+    justify-content:center;
+    overflow-x:hidden;
+    color:var(--txt);
+    font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:
+      radial-gradient(900px 620px at 50% -12%, #35184f 0%, rgba(28,12,44,.85) 42%, rgba(8,5,15,0) 72%),
+      radial-gradient(700px 500px at 90% 110%, rgba(120,40,140,.22) 0%, rgba(8,5,15,0) 65%),
+      #08050f;
+    -webkit-font-smoothing:antialiased;
+  }
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.5;pointer-events:none;z-index:0}
+  .orb-a{width:420px;height:420px;left:-160px;top:-120px;background:#7c3aed;animation:drift 18s ease-in-out infinite}
+  .orb-b{width:380px;height:380px;right:-140px;bottom:-100px;background:#db2777;animation:drift 22s ease-in-out infinite reverse}
+  @keyframes drift{50%{transform:translate(40px,50px) scale(1.12)}}
+
+  .app{position:relative;z-index:1;width:100%;max-width:900px;display:flex;flex-direction:column;align-items:center}
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center;margin-bottom:26px}
+  .badge{
+    display:inline-block;padding:5px 12px;margin-bottom:16px;
+    font-size:10.5px;letter-spacing:.16em;font-weight:700;
+    color:#e7c9ff;border:1px solid rgba(214,169,255,.35);border-radius:999px;
+    background:rgba(140,80,200,.14);
+  }
+  h1{
+    margin:0;font-size:clamp(32px,7.4vw,50px);line-height:1.12;letter-spacing:-.02em;font-weight:800;
+    background:linear-gradient(100deg,#5eead4 0%,#60a5fa 24%,#a78bfa 48%,#f472b6 72%,#fbbf24 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 6px 30px rgba(167,139,250,.28));
+  }
+  .sub{margin:12px 0 0;font-size:14.5px;color:var(--muted);letter-spacing:.01em}
+
+  /* ---------- search ---------- */
+  .search{
+    width:100%;max-width:600px;display:flex;gap:10px;padding:9px;
+    background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
+    border:1px solid var(--line);border-radius:20px;
+    box-shadow:0 18px 50px -18px rgba(0,0,0,.9), inset 0 1px 0 rgba(255,255,255,.07);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  }
+  .field{position:relative;flex:1;display:flex;align-items:center;min-width:0}
+  .field-icon{position:absolute;left:15px;font-size:15px;opacity:.55;pointer-events:none}
+  #name{
+    width:100%;padding:15px 16px 15px 41px;font-size:16px;font-family:inherit;color:var(--txt);
+    background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.09);border-radius:14px;
+    outline:none;transition:border-color .2s,box-shadow .2s,background .2s;
+  }
+  #name::placeholder{color:#7d7194}
+  #name:focus{
+    border-color:rgba(244,114,182,.65);
+    background:rgba(0,0,0,.5);
+    box-shadow:0 0 0 4px rgba(244,114,182,.13);
+  }
+  #name.shake{animation:shake .38s}
+  @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+  .go{
+    flex:none;padding:0 24px;font:inherit;font-weight:700;font-size:15px;color:#fff;white-space:nowrap;
+    border:0;border-radius:14px;cursor:pointer;letter-spacing:.02em;
+    background:linear-gradient(135deg,#ec4899 0%,#a855f7 52%,#6366f1 100%);
+    box-shadow:0 8px 24px -8px rgba(236,72,153,.8), inset 0 1px 0 rgba(255,255,255,.3);
+    transition:transform .15s, filter .2s, opacity .2s;
+  }
+  .go:hover{filter:brightness(1.08)}
+  .go:active{transform:scale(.965)}
+  .go:disabled{opacity:.65;cursor:progress}
+  .hint{
+    margin:12px 0 0;font-size:12.5px;color:#8d81a5;min-height:18px;
+    transition:color .2s;
+  }
+  .hint.error{color:#fb7185}
+
+  /* ---------- result card ---------- */
+  .card{
+    width:100%;margin-top:30px;padding:30px;
+    display:grid;grid-template-columns:280px 1fr;gap:34px;align-items:center;
+    background:linear-gradient(165deg,rgba(255,255,255,.075),rgba(255,255,255,.028));
+    border:1px solid var(--line);border-radius:28px;
+    box-shadow:0 30px 80px -30px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.08);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    opacity:0;transform:translateY(18px) scale(.985);
+    transition:opacity .5s ease, transform .5s cubic-bezier(.16,1,.3,1);
+  }
+  .card[hidden]{display:none}
+  .card.in{opacity:1;transform:none}
+
+  .gauge{position:relative;width:100%;max-width:280px;margin:0 auto;aspect-ratio:1}
+  .gauge svg{display:block;width:100%;height:100%;overflow:visible}
+  .track{fill:none;stroke:rgba(255,255,255,.075);stroke-width:15}
+  .prog{
+    fill:none;stroke:url(#rainbow);stroke-width:15;stroke-linecap:round;
+    filter:drop-shadow(0 0 10px var(--accent));
+  }
+  .gauge-center{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;gap:2px;
+  }
+  .gauge-label{
+    font-size:10px;font-weight:700;letter-spacing:.26em;color:#8b7fa4;
+    margin-bottom:9px;
+  }
+  .num{
+    font-size:66px;font-weight:800;line-height:1;letter-spacing:-.04em;
+    font-variant-numeric:tabular-nums;
+    background:linear-gradient(180deg,#fff,#d8c8ff);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 0 26px rgba(196,160,255,.45));
+  }
+  .num-sub{font-size:11px;font-weight:600;letter-spacing:.22em;color:#8f83a8}
+
+  .detail{min-width:0}
+  .who{display:flex;align-items:center;gap:9px;font-size:12.5px;color:#9186a8;margin-bottom:9px;flex-wrap:wrap}
+  .who .dot{width:3px;height:3px;border-radius:50%;background:#5f5474}
+  .who strong{color:#d6c9ee;font-weight:600}
+  h2{
+    margin:0 0 10px;font-size:25px;line-height:1.25;font-weight:800;letter-spacing:-.01em;
+    color:var(--accent);
+  }
+  .verdict{margin:0 0 20px;font-size:14.5px;line-height:1.75;color:#cfc3e4}
+
+  .bars{display:flex;flex-direction:column;gap:11px;margin-bottom:18px}
+  .bar-row{display:flex;flex-direction:column;gap:5px}
+  .bar-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:#a294bd}
+  .bar-top b{font-weight:700;font-size:12px;color:#e3d8f7;font-variant-numeric:tabular-nums}
+  .bar-track{height:7px;border-radius:999px;background:rgba(255,255,255,.075);overflow:hidden}
+  .bar-fill{
+    height:100%;width:0;border-radius:999px;
+    transition:width 1s cubic-bezier(.16,1,.3,1);
+  }
+
+  .note{
+    font-size:12px;line-height:1.65;color:#8d80a6;font-style:italic;
+    padding-left:11px;border-left:2px solid rgba(255,255,255,.12);margin-bottom:20px;
+  }
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .ghost{
+    font:inherit;font-size:13px;font-weight:600;color:#e6dbf7;cursor:pointer;
+    padding:10px 16px;border-radius:12px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    transition:background .18s,border-color .18s,transform .12s;
+  }
+  .ghost:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22)}
+  .ghost:active{transform:scale(.97)}
+  .ghost.share{
+    color:#fff;border-color:transparent;
+    background:linear-gradient(135deg,#ec4899,#a855f7 55%,#6366f1);
+    box-shadow:0 8px 22px -10px rgba(236,72,153,.9), inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  .ghost.share:hover{filter:brightness(1.08);border-color:transparent}
+
+  /* ---------- history ---------- */
+  .history{width:100%;max-width:600px;margin-top:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .history[hidden]{display:none}
+  .history-label{font-size:11px;letter-spacing:.14em;color:#6f6488;text-transform:uppercase;font-weight:700}
+  .chips{display:flex;gap:7px;flex-wrap:wrap}
+  .chip{
+    font:inherit;font-size:12px;color:#cbbde3;cursor:pointer;
+    padding:6px 11px;border-radius:999px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+    transition:background .18s,color .18s;
+    max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .chip:hover{background:rgba(255,255,255,.12);color:#fff}
+  .chip em{font-style:normal;color:#f0a7d0;font-weight:700;margin-left:5px}
+
+  footer{
+    margin-top:46px;text-align:center;font-size:11.5px;line-height:1.9;color:#655a7c;
+    max-width:520px;
+  }
+
+  /* ---------- confetti ---------- */
+  .confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:99;overflow:hidden}
+  .confetti{
+    position:absolute;top:-24px;width:8px;height:13px;border-radius:2px;opacity:0;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    0%{opacity:1;transform:translate3d(0,0,0) rotate(0)}
+    100%{opacity:.85;transform:translate3d(var(--dx,0),105vh,0) rotate(var(--rot,540deg))}
+  }
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);
+    max-width:86vw;padding:11px 18px;border-radius:999px;text-align:center;
+    font-size:13px;color:#f4ecff;background:rgba(24,12,38,.96);
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 14px 40px rgba(0,0,0,.65);
+    opacity:0;pointer-events:none;z-index:200;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:760px){
+    body{padding:34px 15px 44px}
+    .card{grid-template-columns:1fr;gap:24px;padding:24px 20px;margin-top:24px}
+    .gauge{max-width:230px}
+    .num{font-size:56px}
+    .detail{text-align:center}
+    .who{justify-content:center}
+    .verdict{font-size:14px;margin-bottom:18px}
+    .note{text-align:left}
+    .actions{justify-content:center}
+    .history{justify-content:center}
+    .search{flex-wrap:wrap;border-radius:18px}
+    .go{width:100%;padding:14px 20px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+    .orb{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+
+<main class="app">
+  <header class="hero">
+    <span class="badge">FOR FUN · 纯属娱乐</span>
+    <h1>Gay 指数检测器</h1>
+    <p class="sub">输入一个名字，测出 1–100 的彩虹含量 🌈</p>
+  </header>
+
+  <form class="search" id="form" autocomplete="off" novalidate>
+    <div class="field">
+      <span class="field-icon" aria-hidden="true">🔍</span>
+      <input id="name" name="name" type="text" maxlength="24" placeholder="输入名字 / 昵称…" aria-label="名字" enterkeyhint="go">
+    </div>
+    <button class="go" id="goBtn" type="submit">开始检测</button>
+  </form>
+  <p class="hint" id="hint">同名同分，童叟无欺 ✨</p>
+
+  <section class="card" id="card" hidden aria-live="polite">
+    <div class="gauge">
+      <svg viewBox="0 0 260 260" aria-hidden="true">
+        <defs>
+          <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stop-color="#5eead4"/>
+            <stop offset="27%"  stop-color="#60a5fa"/>
+            <stop offset="52%"  stop-color="#a78bfa"/>
+            <stop offset="76%"  stop-color="#f472b6"/>
+            <stop offset="100%" stop-color="#fbbf24"/>
+          </linearGradient>
+        </defs>
+        <circle class="track" cx="130" cy="130" r="110"/>
+        <circle class="prog" id="prog" cx="130" cy="130" r="110" transform="rotate(-90 130 130)"/>
+      </svg>
+      <div class="gauge-center">
+        <div class="gauge-label">GAY INDEX</div>
+        <div class="num" id="num">0</div>
+        <div class="num-sub">/ 100</div>
+      </div>
+    </div>
+
+    <div class="detail">
+      <div class="who">
+        <strong id="whoName"></strong>
+        <span class="dot"></span>
+        <span id="stamp"></span>
+      </div>
+      <h2 id="tierName"></h2>
+      <p class="verdict" id="verdict"></p>
+      <div class="bars" id="bars"></div>
+      <div class="note" id="note"></div>
+      <div class="actions">
+        <button class="ghost share" id="shareBtn" type="button">分享给朋友</button>
+        <button class="ghost" id="copyBtn" type="button">复制报告</button>
+        <button class="ghost" id="againBtn" type="button">再测一次</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="history" id="historyWrap" hidden>
+    <span class="history-label">最近</span>
+    <div class="chips" id="history"></div>
+  </div>
+
+  <footer>
+    本检测器纯属娱乐，结果由名字哈希随机生成，与性取向、性别认同无关。<br>
+    爱不分取向 🏳️‍🌈
+  </footer>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (s) { return document.querySelector(s); };
+
+  var form      = $('#form');
+  var input     = $('#name');
+  var goBtn     = $('#goBtn');
+  var hint      = $('#hint');
+  var card      = $('#card');
+  var prog      = $('#prog');
+  var numEl     = $('#num');
+  var tierName  = $('#tierName');
+  var verdict   = $('#verdict');
+  var whoName   = $('#whoName');
+  var stamp     = $('#stamp');
+  var barsEl    = $('#bars');
+  var noteEl    = $('#note');
+  var copyBtn   = $('#copyBtn');
+  var shareBtn  = $('#shareBtn');
+  var againBtn  = $('#againBtn');
+  var toastEl   = $('#toast');
+  var histWrap  = $('#historyWrap');
+  var histEl    = $('#history');
+  var layer     = $('#confettiLayer');
+
+  var DEFAULT_HINT = '同名同分，童叟无欺 ✨';
+  var CIRC = 2 * Math.PI * 110;   // 691.15
+  var STORE_KEY = 'gayIndex.history.v1';
+
+  /* ---------------- 评级 ---------------- */
+  var TIERS = [
+    { min: 0,  max: 0,   name: '彩虹绝缘体',    emoji: '🧯', color: '#94a3b8',
+      desc: '仪器连测三次，每次读数都被弹回 0。系统怀疑你和彩虹之间隔着一层防弹玻璃。',
+      tags: ['零信号', '仪器沉默', '反向天选'] },
+    { min: 1,  max: 10,  name: '极地冰山',      emoji: '🧊', color: '#8fb8e8',
+      desc: '检测仪刚碰到你就结冰了。你对彩虹的敏感度，约等于对周一早上的热爱。',
+      tags: ['钢铁防线', '情绪稳定', '不感兴趣'] },
+    { min: 11, max: 25,  name: '钢铁直男',      emoji: '🔩', color: '#9aa8c7',
+      desc: '直得很坦荡，也很可爱。审美是实用主义，情感表达走说明书风格，但意外地可靠。',
+      tags: ['实用主义', '直线思维', '老实人'] },
+    { min: 26, max: 40,  name: '微弯待定',      emoji: '🌱', color: '#86e0b6',
+      desc: '嘴上说着"我随便"，衣柜里却悄悄多了一件粉色单品。潜力股，观察期。',
+      tags: ['口嫌体正直', '潜力股', '粉色预警'] },
+    { min: 41, max: 55,  name: '薛定谔的取向',  emoji: '🌀', color: '#8ec5ff',
+      desc: '在直与弯之间反复横跳，观测之前两种状态同时成立。建议多观测几次。',
+      tags: ['叠加态', '反复横跳', '看心情'] },
+    { min: 56, max: 70,  name: '彩虹预备役',    emoji: '🌤', color: '#c4b5fd',
+      desc: '已经能一眼认出别人的口红色号，并且非常自然地给出了专业建议。',
+      tags: ['色号专家', '审美在线', '好会夸人'] },
+    { min: 71, max: 85,  name: '资深彩虹',      emoji: '🌈', color: '#f0abfc',
+      desc: '你的歌单里有一半是女歌手，剩下那一半是更厉害的女歌手。',
+      tags: ['歌单玄学', '情绪价值拉满', '氛围感'] },
+    { min: 86, max: 95,  name: '彩虹本虹',      emoji: '💅', color: '#fb7185',
+      desc: '检测仪直接过热报警。你的存在本身就是一场小型骄傲游行。',
+      tags: ['行走的彩虹', '全场焦点', '传说级'] },
+    { min: 96, max: 100, name: '独角兽本兽',    emoji: '🦄', color: '#fbbf24',
+      desc: '仪器已经为你融化。传说中的人物，建议直接出道，不要浪费天赋。',
+      tags: ['神话生物', '仪器杀手', '建议出道'] }
+  ];
+
+  var NOTES = [
+    '检测过程中，仪器发出了由衷赞叹的声音。',
+    '本结果已通过（并不存在的）伦理委员会审核。',
+    '建议截图保存，用于日后自我怀疑时反复参考。',
+    '检测耗时 0.4 秒，其中 0.3 秒用来震惊。',
+    '系统已自动为你的名字加上彩虹描边。',
+    '该数值稳定复现，改名会导致重新投胎。',
+    '温馨提示：本数值高不代表会穿搭，低不代表没人爱。',
+    '数据来源：一台由玩笑驱动的量子算命机。'
+  ];
+
+  var DIMS = [
+    { key: 'a', label: '穿搭审美', color: 'linear-gradient(90deg,#5eead4,#60a5fa)' },
+    { key: 'b', label: '情感细腻', color: 'linear-gradient(90deg,#60a5fa,#a78bfa)' },
+    { key: 'c', label: '音乐品味', color: 'linear-gradient(90deg,#a78bfa,#f472b6)' },
+    { key: 'd', label: '彩虹直觉', color: 'linear-gradient(90deg,#f472b6,#fbbf24)' }
+  ];
+
+  /* 彩蛋：源码里只存名字的哈希，不出现明文（别问，问就是天选） */
+  var SPECIAL_HASHES = {
+    'fa17c0b7afc40808': 100,
+    '04ee8112200fe54a': 0
+  };
+  var SPECIAL_NOTES = {
+    'fa17c0b7afc40808': '系统已跳过计算：该名字被写进了满分白名单，仪器当场起立鼓掌。',
+    '04ee8112200fe54a': '系统尝试了三次，最后放弃了：这个名字对彩虹完全免疫。'
+  };
+
+  /* ---------------- 哈希 ---------------- */
+  function hash32(str) {
+    var h = 0x811c9dc5;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 0x01000193);
+    }
+    h ^= h >>> 16; h = Math.imul(h, 0x7feb352d);
+    h ^= h >>> 15; h = Math.imul(h, 0x846ca68b);
+    h ^= h >>> 16;
+    return h >>> 0;
+  }
+  function pick(key, salt) { return hash32(salt + '|' + key); }
+  function hex8(n) { return ('00000000' + n.toString(16)).slice(-8); }
+  function nameKey(key) { return hex8(pick(key, 'special-a')) + hex8(pick(key, 'special-b')); }
+  function specialScore(key) {
+    var k = nameKey(key);
+    return Object.prototype.hasOwnProperty.call(SPECIAL_HASHES, k) ? SPECIAL_HASHES[k] : null;
+  }
+  function isSpecial(key) { return specialScore(key) !== null; }
+  function scoreOf(key) {
+    var s = specialScore(key);
+    if (s !== null) return s;
+    return 1 + (pick(key, 'score') % 100);
+  }
+  function tierOf(score) {
+    for (var i = 0; i < TIERS.length; i++) {
+      if (score >= TIERS[i].min && score <= TIERS[i].max) return TIERS[i];
+    }
+    return TIERS[TIERS.length - 1];
+  }
+  function noteOf(key) {
+    var k = nameKey(key);
+    if (Object.prototype.hasOwnProperty.call(SPECIAL_NOTES, k)) return SPECIAL_NOTES[k];
+    return NOTES[pick(key, 'note') % NOTES.length];
+  }
+
+  /* ---------------- 动画工具 ---------------- */
+  var raf = window.requestAnimationFrame || function (f) { return setTimeout(f, 16); };
+  var busy = false;
+  var REDUCE = false;
+  try { REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var state = { name: '', score: 0, tier: null };
+  var numGen = 0;          // 数字动画令牌，防止连点时多段动画互相覆盖
+  var hideTimer = 0;       // "再测一次"后的隐藏定时器
+
+  function countTo(el, target, duration) {
+    var gen = ++numGen;
+    if (REDUCE || target === 0) { el.textContent = target; return; }
+    var t0 = null;
+    function step(t) {
+      if (gen !== numGen) return;      // 已被更新的检测取代
+      if (t0 === null) t0 = t;
+      var p = Math.min(1, (t - t0) / duration);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased);
+      if (p < 1) raf(step);
+      else el.textContent = target;
+    }
+    el.textContent = '0';
+    raf(step);
+  }
+
+  function setRing(score, animate) {
+    var offset = CIRC * (1 - score / 100);
+    if (REDUCE) {
+      prog.style.transition = 'none';
+      prog.style.strokeDasharray = CIRC;
+      prog.style.strokeDashoffset = offset;
+      return;
+    }
+    prog.style.transition = animate ? 'stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1)' : 'none';
+    prog.style.strokeDasharray = CIRC;
+    if (!animate) {
+      prog.style.strokeDashoffset = CIRC;
+      void prog.getBoundingClientRect();
+      prog.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.16,1,.3,1)';
+    }
+    raf(function () {
+      raf(function () { prog.style.strokeDashoffset = offset; });
+    });
+  }
+
+  function confetti(score) {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var colors = score === 0
+      ? ['#64748b', '#94a3b8', '#475569', '#cbd5e1']
+      : ['#5eead4', '#60a5fa', '#a78bfa', '#f472b6', '#fbbf24', '#fb7185', '#ffffff'];
+    var count = score === 0 ? 9 : 16 + Math.round(score * 0.22);
+    for (var i = 0; i < count; i++) {
+      var bit = document.createElement('span');
+      bit.className = 'confetti';
+      bit.style.left = (Math.random() * 100) + 'vw';
+      bit.style.background = colors[(Math.random() * colors.length) | 0];
+      bit.style.width = (5 + Math.random() * 6) + 'px';
+      bit.style.height = (8 + Math.random() * 9) + 'px';
+      bit.style.setProperty('--dx', (Math.random() * 200 - 100) + 'px');
+      bit.style.setProperty('--rot', (Math.random() * 900 - 200) + 'deg');
+      bit.style.animationDuration = (2 + Math.random() * 1.8) + 's';
+      bit.style.animationDelay = (Math.random() * 0.45) + 's';
+      layer.appendChild(bit);
+      (function (node) {
+        setTimeout(function () { node.remove(); }, 4600);
+      })(bit);
+    }
+  }
+
+  /* ---------------- 历史记录 ---------------- */
+  function loadHistory() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function saveHistory(arr) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(arr.slice(0, 8))); } catch (e) {}
+  }
+  function renderHistory() {
+    var arr = loadHistory();
+    if (!arr.length) { histWrap.hidden = true; return; }
+    histWrap.hidden = false;
+    histEl.textContent = '';
+    arr.forEach(function (item) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.title = item.name + ' · ' + item.score + '/100';
+      b.textContent = item.name;
+      var em = document.createElement('em');
+      em.textContent = item.score;
+      b.appendChild(em);
+      b.addEventListener('click', function () {
+        input.value = item.name;
+        run(item.name);
+      });
+      histEl.appendChild(b);
+    });
+  }
+
+  function pushHistory(name, score) {
+    var arr = loadHistory().filter(function (x) { return x.name !== name; });
+    arr.unshift({ name: name, score: score });
+    saveHistory(arr);
+    renderHistory();
+  }
+
+  /* ---------------- 主流程 ---------------- */
+  function flashHint(msg, isError) {
+    hint.textContent = msg;
+    hint.classList.toggle('error', !!isError);
+    clearTimeout(flashHint._t);
+    flashHint._t = setTimeout(function () {
+      hint.textContent = DEFAULT_HINT;
+      hint.classList.remove('error');
+    }, 2400);
+  }
+
+  var toastTimer = 0;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('on'); }, 2400);
+  }
+
+  function copyText(text, okMsg) {
+    function ok() { showToast(okMsg || '已复制'); }
+    function fallback() {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:-999px;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        var done = document.execCommand('copy');
+        ta.remove();
+        if (done) ok(); else showToast('复制失败，请手动选择文字');
+      } catch (e) { showToast('复制失败'); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(ok, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function render(name, key, score) {
+    var tier = tierOf(score);
+    var accent = tier.color;
+
+    clearTimeout(hideTimer);
+    state = { name: name, score: score, tier: tier };
+
+    document.documentElement.style.setProperty('--accent', accent);
+    card.style.setProperty('--accent', accent);
+
+    whoName.textContent = name;
+    var d = new Date();
+    stamp.textContent = d.getFullYear() + '.' +
+      String(d.getMonth() + 1).padStart(2, '0') + '.' +
+      String(d.getDate()).padStart(2, '0');
+
+    tierName.textContent = tier.emoji + ' ' + tier.name;
+    verdict.textContent = '「' + name + '」的彩虹含量为 ' + score + '/100。' + tier.desc;
+    noteEl.textContent = noteOf(key);
+
+    /* 维度条 */
+    barsEl.textContent = '';
+    var sv = specialScore(key);
+    DIMS.forEach(function (dim, i) {
+      var val = sv !== null
+        ? Math.max(0, Math.min(100, sv + (pick(key, 'dim-' + dim.key) % 7) - 3))
+        : 1 + (pick(key, 'dim-' + dim.key) % 100);
+
+      var row = document.createElement('div');
+      row.className = 'bar-row';
+
+      var top = document.createElement('div');
+      top.className = 'bar-top';
+      var lbl = document.createElement('span');
+      lbl.textContent = dim.label;
+      var b = document.createElement('b');
+      b.textContent = val;
+      top.appendChild(lbl); top.appendChild(b);
+
+      var track = document.createElement('div');
+      track.className = 'bar-track';
+      var fill = document.createElement('div');
+      fill.className = 'bar-fill';
+      fill.style.background = dim.color;
+      track.appendChild(fill);
+
+      row.appendChild(top);
+      row.appendChild(track);
+      barsEl.appendChild(row);
+
+      var delay = REDUCE ? 0 : 90 + i * 90;
+      setTimeout(function () { fill.style.width = val + '%'; }, delay);
+    });
+
+    /* 表盘 */
+    card.hidden = false;
+    void card.offsetWidth;
+    card.classList.add('in');
+    setRing(score, true);
+    countTo(numEl, score, 950);
+    confetti(score);
+
+    pushHistory(name, score);
+
+    if (window.innerWidth < 760 && card.getBoundingClientRect().top < 0) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function run(raw) {
+    if (busy) return;
+    var name = String(raw || '').trim().replace(/\s+/g, ' ');
+    if (!name) {
+      flashHint('先输入一个名字啦～', true);
+      input.classList.remove('shake');
+      void input.offsetWidth;
+      input.classList.add('shake');
+      input.focus();
+      return;
+    }
+    if (name.length > 24) name = name.slice(0, 24);
+
+    var key = name.toLowerCase();
+    var score = scoreOf(key);
+
+    busy = true;
+    goBtn.disabled = true;
+    var label = goBtn.textContent;
+    goBtn.textContent = '检测中…';
+
+    setTimeout(function () {
+      render(name, key, score);
+      goBtn.textContent = label;
+      goBtn.disabled = false;
+      busy = false;
+    }, 420);
+  }
+
+  /* ---------------- 事件 ---------------- */
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    run(input.value);
+  });
+
+  goBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    run(input.value);
+  });
+
+  input.addEventListener('input', function () {
+    hint.classList.remove('error');
+  });
+
+  copyBtn.addEventListener('click', function () {
+    var name = state.name || whoName.textContent;
+    var score = state.tier ? state.score : Number(numEl.textContent);
+    var tn = tierName.textContent;
+    var hosted = location.protocol === 'http:' || location.protocol === 'https:';
+    var link = hosted ? location.origin + location.pathname + '?n=' + encodeURIComponent(name) : '';
+    var text = '🌈 Gay 指数检测报告\n姓名：' + name + '\n指数：' + score + ' / 100\n评级：' + tn +
+      (link ? '\n测测你的：' + link : '') +
+      '\n\n—— 纯属娱乐，别当真 🌈';
+
+    function done(ok) {
+      var old = copyBtn.textContent;
+      copyBtn.textContent = ok ? '已复制 ✓' : '复制失败';
+      setTimeout(function () { copyBtn.textContent = old; }, 1500);
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, function () { fallback(); });
+    } else {
+      fallback();
+    }
+
+    function fallback() {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:-999px;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        ta.remove();
+        done(ok);
+      } catch (e) { done(false); }
+    }
+  });
+
+  shareBtn.addEventListener('click', function () {
+    if (!state.tier) return;
+    var hosted = location.protocol === 'http:' || location.protocol === 'https:';
+    var link = hosted ? location.origin + location.pathname + '?n=' + encodeURIComponent(state.name) : '';
+    var line = '「' + state.name + '」的 Gay 指数是 ' + state.score + '/100 —— ' +
+      state.tier.emoji + ' ' + state.tier.name + ' 🌈';
+    var payload = line + (link ? '\n测测你的：' + link : '');
+
+    if (hosted && navigator.share) {
+      navigator.share({ title: 'Gay 指数检测器 🌈', text: line, url: link }).catch(function (err) {
+        if (err && err.name === 'AbortError') return;   // 用户自己取消了
+        copyText(payload, '链接已复制，去粘贴给朋友吧');
+      });
+      return;
+    }
+    if (link) copyText(payload, '链接已复制，去粘贴给朋友吧');
+    else copyText(payload, '已复制文案；把网页放到网上后就能分享链接');
+  });
+
+  againBtn.addEventListener('click', function () {
+    input.value = '';
+    input.focus();
+    card.classList.remove('in');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(function () { card.hidden = true; }, 260);
+  });
+
+  /* 初始化 */
+  setRing(0, false);
+  prog.style.strokeDashoffset = CIRC;
+  renderHistory();
+
+  // 支持 ?n=名字 直接出结果（方便分享 / 书签）
+  var pre = null;
+  try {
+    var qs = new URLSearchParams(location.search);
+    pre = qs.get('n') || qs.get('name');
+  } catch (e) {}
+  if (pre) {
+    input.value = pre;
+    setTimeout(function () { run(pre); }, 260);
+  } else if (window.innerWidth >= 760) {
+    input.focus();
+  }
+})();
+</script>
+</body>
+</html>
